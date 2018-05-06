@@ -3,6 +3,7 @@
 //
 //C++98/03, C++11 (+STL)
 //incl: Astronomy/СelestialBody.h
+//      AlgorithmsMain.h
 //
 //
 //byTRiOLD -l-      04.18 upd: 05.18
@@ -15,6 +16,7 @@
 #include <string>
 
 #include "Astronomy/СelestialBody.h"
+#include "AlgorithmsMain.h"
 
 ////////////////////////////////////
 class Catalog
@@ -33,7 +35,7 @@ private:
     std::vector<double> m_maxParams;
     std::vector<double> m_minParams;
 
-private:
+protected:
     void _init()
     {
 
@@ -63,8 +65,8 @@ public:
 
         int I = CelestialBodyParamMain_MAX;
         int J = getObjCount();
-        m_minParams.resize( I, 268435456.0 );
-        m_maxParams.resize( I, -268435456.0 );
+        m_minParams.resize( I, 2147483647 );
+        m_maxParams.resize( I, -2147483647 );
 
         for( int j = 0; j < J; j++ )
             for( int i = 0; i < I; I++ )
@@ -77,7 +79,7 @@ public:
 
     void setupObject( CelestialBodyType type, std::string ID, const int n )
     {
-        if( n > 0 && n < getObjCount() )
+        if( n >= 0 && n < getObjCount() )
         {
             getObj( n )->setHeader( &m_header );
             getObj( n )->setID( ID );
@@ -87,14 +89,58 @@ public:
 
     virtual bool readFile( std::string fileName )
     {
+        std::fstream file;
+        file.open( fileName, std::ios_base::in );
+        if( !file.is_open() )   return false;
 
+        unsigned int rows = 0;
+        std::string fileString;
+        while( std::getline( file, fileString ) )
+            rows++;
 
+        file.close();   m_objects.resize( rows );
+        file.open( fileName, std::ios_base::in );
+
+        std::getline( file, m_header );
+        unsigned int colms = AlgorithmsMain::calculateWordsInSrting( m_header );
+
+        std::string ID; unsigned int k = 0;
+        while( std::getline( file, fileString ) )
+        {
+            strings W = AlgorithmsMain::divideByWordsSrting( fileString, colms );
+            ID = "OBJ" + std::to_string( k+1 );
+            setupObject( UN_CelestialBodyType, ID, k );
+            for( int i = 1; i < CelestialBodyParamMain_MAX; i++ )
+                m_objects[k].setParam( stod( W[i] ), i );
+
+            k++;
+        }
+
+        file.close();
         return true;
     }
 
     virtual bool writeToFile( std::string fileName )
     {
+        if( m_objects.empty() )
+            return false;
 
+        std::fstream file;
+        file.open( fileName, std::ios_base::out );
+        if( !file.is_open() )   return false;
+
+        file.write( m_header.c_str(), m_header.size() );
+
+        unsigned int i = 0;
+        while( i < m_objects.size() )
+        {
+            std::string S;
+            for( int i = 1; i < CelestialBodyParamMain_MAX; i++ )
+                S += std::to_string( m_objects[i].getParam( i ) ) + '\t';
+            S[S.size()-1] = '\n';
+            file.write( S.c_str(), S.size() );
+            i++;
+        }
 
         return true;
     }

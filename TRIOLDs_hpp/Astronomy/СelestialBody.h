@@ -16,9 +16,9 @@
 ////////////////////////////////////
 enum CelestialBodyParamMain
 {
-    RA, DEC, muRA, muDEC,
+    ID, RA, DEC, muRA, muDEC,
     eRA, eDEC, eMuRA, eMuDEC,
-    QUALITY,
+    MAG, QUALITY,
     CelestialBodyParamMain_MAX
 };
 enum CelestialBodyType
@@ -67,6 +67,19 @@ public:
         if( m_header )
             header = *m_header;
         return header;
+    }
+
+    bool setAllParamMain( double ra, double dec, double muRa, double muDec,
+                             double eRa, double eDec, double eMuRa, double eMuDec,
+                                double mag, double quality)
+    {
+        m_param.at( RA ) = ra;          m_param.at( DEC ) = dec;
+        m_param.at( muRA ) = muRa;      m_param.at( muDEC ) = muDec;
+        m_param.at( eRA ) = eRa;        m_param.at( eDEC ) = eDec;
+        m_param.at( eMuRA ) = eMuRa;    m_param.at( eMuDEC ) = eMuDec;
+        m_param.at( MAG ) = mag;        m_param.at( QUALITY ) = quality;
+
+        return true;
     }
 
     bool setParam( double value, const int i )
