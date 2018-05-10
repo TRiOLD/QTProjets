@@ -1,5 +1,5 @@
 ////////////////////////////////////
-//class CelestialBody
+//class CelestialBodyzz
 //
 //C++98/03, C++11 (+STL)
 //

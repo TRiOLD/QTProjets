@@ -119,7 +119,8 @@ DIST          = /usr/lib/i386-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/features/lex.prf \
-		../TRIOLDs_hpp/TRIOLDs_hpp.pro Astronomy/Сatalog.h \
+		../TRIOLDs_hpp/TRIOLDs_hpp.pro Astronomy/Fits.h \
+		Astronomy/Сatalog.h \
 		Astronomy/СelestialBody.h \
 		matrix.h \
 		MathMatrix.h \
@@ -315,7 +316,10 @@ compiler_clean:
 
 ####### Compile
 
-main.o: ../TRIOLDs_hpp/main.cpp 
+main.o: ../TRIOLDs_hpp/main.cpp ../TRIOLDs_hpp/Astronomy/Fits.h \
+		../TRIOLDs_hpp/matrix.h \
+		../TRIOLDs_hpp/AlgorithmsMain.h \
+		../TRIOLDs_hpp/MathMatrix.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../TRIOLDs_hpp/main.cpp
 
 ####### Install

@@ -1,6 +1,7 @@
 #include <iostream>
 using namespace std;
 
+#include "Astronomy/Fits.h"
 #include "Astronomy/Сatalog.h"
 #include "Astronomy/СelestialBody.h"
 #include "AlgorithmsMain.h"
