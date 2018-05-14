@@ -16,7 +16,7 @@
 ////////////////////////////////////
 enum CelestialBodyParamMain
 {
-    ID, RA, DEC, muRA, muDEC,
+    RA, DEC, muRA, muDEC,
     eRA, eDEC, eMuRA, eMuDEC,
     MAG, QUALITY,
     CelestialBodyParamMain_MAX

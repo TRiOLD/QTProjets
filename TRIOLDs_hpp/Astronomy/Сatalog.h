@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include <vector>
 #include <string>
 
@@ -26,6 +27,10 @@ public:
     {
         _init();
     }
+    virtual ~Catalog()
+    {
+
+    }
 
 protected:
     std::string m_header;
@@ -38,7 +43,7 @@ private:
 protected:
     void _init()
     {
-
+        m_header = "RA\tDEC\tmuRA\tmuDEC\teRA\teDEC\teMuRA\teMuDEC\tMAG\tQUALITY\n";
     }
 
 public:
@@ -131,15 +136,17 @@ public:
 
         file.write( m_header.c_str(), m_header.size() );
 
-        unsigned int i = 0;
-        while( i < m_objects.size() )
+        unsigned int k = 0;
+        while( k < m_objects.size() )
         {
-            std::string S;
-            for( int i = 1; i < CelestialBodyParamMain_MAX; i++ )
-                S += std::to_string( m_objects[i].getParam( i ) ) + '\t';
-            S[S.size()-1] = '\n';
-            file.write( S.c_str(), S.size() );
-            i++;
+            for( int i = 0; i < CelestialBodyParamMain_MAX; i++ )
+            {
+                double value = m_objects[k].getParam( i );
+                file << std::fixed << std::setprecision( 10 )
+                     << value << "\t\t";
+            }
+            file << endl;
+            k++;
         }
 
         return true;
