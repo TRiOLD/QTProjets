@@ -105,6 +105,7 @@ DIST          = /usr/lib/i386-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/linux-clang/qmake.conf \
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		../TRIOLDs_hpp/.qmake.stash \
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -123,7 +124,7 @@ DIST          = /usr/lib/i386-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		Astronomy/СelestialBody.h \
 		matrix.h \
 		MathMatrix.h \
-		AlgorithmsMain.h ../TRIOLDs_hpp/main.cpp
+		Algorithms.h ../TRIOLDs_hpp/main.cpp
 QMAKE_TARGET  = TRIOLDs_hpp
 DESTDIR       = 
 TARGET        = TRIOLDs_hpp
@@ -188,6 +189,7 @@ Makefile: ../TRIOLDs_hpp/TRIOLDs_hpp.pro /usr/lib/i386-linux-gnu/qt5/mkspecs/lin
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/linux-clang/qmake.conf \
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/i386-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -256,6 +258,7 @@ Makefile: ../TRIOLDs_hpp/TRIOLDs_hpp.pro /usr/lib/i386-linux-gnu/qt5/mkspecs/lin
 /usr/lib/i386-linux-gnu/qt5/mkspecs/features/qt_config.prf:
 /usr/lib/i386-linux-gnu/qt5/mkspecs/linux-clang/qmake.conf:
 /usr/lib/i386-linux-gnu/qt5/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /usr/lib/i386-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf:
 /usr/lib/i386-linux-gnu/qt5/mkspecs/features/toolchain.prf:
 /usr/lib/i386-linux-gnu/qt5/mkspecs/features/default_pre.prf:
@@ -315,7 +318,7 @@ compiler_clean:
 
 main.o: ../TRIOLDs_hpp/main.cpp ../TRIOLDs_hpp/Astronomy/Fits.h \
 		../TRIOLDs_hpp/matrix.h \
-		../TRIOLDs_hpp/AlgorithmsMain.h \
+		../TRIOLDs_hpp/Algorithms.h \
 		../TRIOLDs_hpp/MathMatrix.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../TRIOLDs_hpp/main.cpp
 

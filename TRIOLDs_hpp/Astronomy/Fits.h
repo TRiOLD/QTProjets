@@ -3,7 +3,7 @@
 //
 //C++98/03, C++11 (+STL)
 //incl: matrix.h
-//      AlgorithmsMain.h
+//      Algorithms.h
 //
 //
 //byTRiOLD -l-      01.18 upd: 05.18
@@ -16,7 +16,7 @@
 #include <string>
 
 #include "matrix.h"
-#include "AlgorithmsMain.h"
+#include "Algorithms.h"
 
 ////////////////////////////////////
 enum FitsKeyWord
@@ -185,7 +185,7 @@ private:
             {
                 unsigned short int temp;
                 m_file.read( (char*)&temp, cellSize );
-                AlgorithmsMain::swapBytes( &temp, 0, 1 );
+                Algorithms::swapBytes( &temp, 0, 1 );
                 (*m_DATA)[j][i] = (float)temp;
             }
 
@@ -205,7 +205,7 @@ private:
             for( int i = 0; i < X; i++ )
             {
                 unsigned short int temp = (unsigned short int)((*m_DATA)[j][i]);
-                AlgorithmsMain::swapBytes( &temp, 0, 1 );
+                Algorithms::swapBytes( &temp, 0, 1 );
                 m_file.write( (char*)&temp, cellSize );
             }
         return true;

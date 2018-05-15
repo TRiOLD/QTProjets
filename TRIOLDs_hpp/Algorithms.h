@@ -1,5 +1,5 @@
 ////////////////////////////////////
-//class AlgorithmsMain
+//class Algorithms
 //
 //C++98/03, C++11 (+STL, cmath)
 //
@@ -17,7 +17,7 @@
 typedef std::vector<std::string> strings;
 
 ////////////////////////////////////
-class AlgorithmsMain
+class Algorithms
 {
 public:
     static void swapBytes( void * buf, int num_b1, int num_b2 )

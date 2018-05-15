@@ -3,7 +3,7 @@
 //
 //C++98/03, C++11 (+STL)
 //incl: Astronomy/СelestialBody.h
-//      AlgorithmsMain.h
+//      Algorithms.h
 //
 //
 //byTRiOLD -l-      04.18 upd: 05.18
@@ -17,7 +17,7 @@
 #include <string>
 
 #include "Astronomy/СelestialBody.h"
-#include "AlgorithmsMain.h"
+#include "Algorithms.h"
 
 ////////////////////////////////////
 class Catalog
@@ -107,12 +107,12 @@ public:
         file.open( fileName, std::ios_base::in );
 
         std::getline( file, m_header );
-        unsigned int colms = AlgorithmsMain::calculateWordsInSrting( m_header );
+        unsigned int colms = Algorithms::calculateWordsInSrting( m_header );
 
         std::string ID; unsigned int k = 0;
         while( std::getline( file, fileString ) )
         {
-            strings W = AlgorithmsMain::divideByWordsSrting( fileString, colms );
+            strings W = Algorithms::divideByWordsSrting( fileString, colms );
             ID = "OBJ" + std::to_string( k+1 );
             setupObject( UN_CelestialBodyType, ID, k );
             for( int i = 1; i < CelestialBodyParamMain_MAX; i++ )

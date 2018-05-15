@@ -11,4 +11,4 @@ HEADERS += \
     Astronomy/СelestialBody.h \
     matrix.h \
     MathMatrix.h \
-    AlgorithmsMain.h
+    Algorithms.h

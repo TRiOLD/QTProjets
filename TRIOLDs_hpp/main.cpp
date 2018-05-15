@@ -4,14 +4,14 @@ using namespace std;
 #include "Astronomy/Fits.h"
 #include "Astronomy/Сatalog.h"
 #include "Astronomy/СelestialBody.h"
-#include "AlgorithmsMain.h"
+#include "Algorithms.h"
 #include "MathMatrix.h"
 #include "matrix.h"
 
 class CatalogGaiaDR2 : public Catalog
 {
 public:
-    virtual bool readFilee( std::string fileName )
+    virtual bool readFile( std::string fileName )
     {
         std::fstream file;
         file.open( fileName, std::ios_base::in );
@@ -19,24 +19,24 @@ public:
 
         unsigned int rows = 0;
         std::string fileString;
+        std::getline( file, fileString );
+        unsigned int colms = Algorithms::calculateWordsInSrting( m_header );
         while( std::getline( file, fileString ) )
             rows++;
 
         file.close();   m_objects.resize( 100 );
         file.open( fileName, std::ios_base::in );
 
-        int colms = 2;
-
         std::string ID; int k = 0;
   //    while( std::getline( file, fileString ) )
         while( k < 100 )
         {
             std::getline( file, fileString );
-            strings W = AlgorithmsMain::divideByWordsSrting( fileString, colms );
+            strings W = Algorithms::divideByWordsSrting( fileString, colms );
 
             ID = "OBJ" + std::to_string( k+1 );
             setupObject( UN_CelestialBodyType, ID, k );
-            for( int i = 0; i < colms; i++ )
+            for( int i = 0; i < (int)colms; i++ )
                 m_objects[k].setParam( stod( W[i] ), i );
 
             k++;
@@ -52,7 +52,7 @@ int main()
     cout << "Test" << endl;
 
     CatalogGaiaDR2 part27;
-    part27.readFilee( "//home//triold//data//gaia2_27.txt" );
+    part27.readFile( "//home//triold//data//gaia2_27.txt" );
 
     cout << part27.writeToFile( "//home//triold//data//newGaia2_27.txt" ) << endl;
 
