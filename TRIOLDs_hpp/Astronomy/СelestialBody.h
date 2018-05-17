@@ -18,7 +18,7 @@ enum CelestialBodyParamMain
 {
     RA, DEC, muRA, muDEC,
     eRA, eDEC, eMuRA, eMuDEC,
-    MAG, QUALITY,
+    PLX, ePLX, MAG, QUALITY,
     CelestialBodyParamMain_MAX
 };
 enum CelestialBodyType

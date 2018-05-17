@@ -17,27 +17,38 @@ public:
         file.open( fileName, std::ios_base::in );
         if( !file.is_open() )   return false;
 
+        //header GaiaDR2 (by Vova):
+        //RA, DEC, eRA, eDEC, Plx, ePlx, muRA, eMuRa, muDEC, eMuDec,
+        //sn, sigSn, gMag, bMag, rMag, Vr, eVr, Teff, Metal
+
         unsigned int rows = 0;
         std::string fileString;
         std::getline( file, fileString );
-        unsigned int colms = Algorithms::calculateWordsInSrting( m_header );
+        unsigned int colms = Algorithms::calculateWordsInSrting( fileString );
         while( std::getline( file, fileString ) )
             rows++;
 
-        file.close();   m_objects.resize( 100 );
+        cout << rows << endl;
+
+        file.close();   m_objects.resize( rows+1 );
         file.open( fileName, std::ios_base::in );
 
-        std::string ID; int k = 0;
-  //    while( std::getline( file, fileString ) )
-        while( k < 100 )
+        int k = 0;
+        while( std::getline( file, fileString ) )
         {
-            std::getline( file, fileString );
             strings W = Algorithms::divideByWordsSrting( fileString, colms );
 
-            ID = "OBJ" + std::to_string( k+1 );
-            setupObject( UN_CelestialBodyType, ID, k );
-            for( int i = 0; i < (int)colms; i++ )
-                m_objects[k].setParam( stod( W[i] ), i );
+            m_objects[k].setParam( stod( W[0] ), RA );
+            m_objects[k].setParam( stod( W[1] ), DEC );
+            m_objects[k].setParam( stod( W[2] ), eRA );
+            m_objects[k].setParam( stod( W[3] ), eDEC );
+            m_objects[k].setParam( stod( W[4] ), PLX );
+            m_objects[k].setParam( stod( W[5] ), ePLX );
+            m_objects[k].setParam( stod( W[6] ), muRA );
+            m_objects[k].setParam( stod( W[7] ), eMuRA );
+            m_objects[k].setParam( stod( W[8] ), muDEC );
+            m_objects[k].setParam( stod( W[9] ), eMuDEC );
+            m_objects[k].setParam( stod( W[12] ), MAG );
 
             k++;
         }
@@ -45,17 +56,57 @@ public:
         file.close();
         return true;
     }
+
+    Fits * createFitsOfThis( unsigned int Y, unsigned int X )
+    {
+        int N = getObjCount();
+
+        double minRa, maxRa, minDec, maxDec;
+        minRa = minDec = 6.283184;
+        maxRa = maxDec = -6.283184;
+        for( int i = 0; i < N; i++ )
+        {
+            double val1 = getObj( i )->getParam( RA );
+            double val2 = getObj( i )->getParam( DEC );
+            if( val1 < minRa )  minRa = val1;
+            if( val1 > maxRa )  maxRa = val1;
+            if( val2 < minDec )  minDec = val2;
+            if( val2 > maxDec )  maxDec = val2;
+        }
+
+        const double scaleX = (double)X / (maxRa - minRa);
+        const double scaleY = (double)Y / (maxDec - minDec);
+
+        matrix<float> * data = new matrix<float>( Y, X );
+        for( int i = 0; i < N; i++ )
+        {
+            int x = int((getObj( i )->getParam( RA ) - minRa) * scaleX);
+            int y = int((getObj( i )->getParam( DEC ) - minDec) * scaleY);
+            if( (unsigned int)x >= X )    x = (int)X - 1;
+            if( (unsigned int)y >= Y )    y = (int)Y - 1;
+            (*data)[y][x]++;
+        }
+
+        Fits * fits = new Fits();
+        fits->setPtrDATA( data );
+        return fits;
+    }
 };
 
 int main()
 {
+    CatalogGaiaDR2 part27;
+    part27.readFile( "//home//triold//data//rgaia2_27.txt" );
+
     cout << "Test" << endl;
 
-    CatalogGaiaDR2 part27;
-    part27.readFile( "//home//triold//data//gaia2_27.txt" );
+    Fits * f = part27.createFitsOfThis( 1000, 1000 );
+    f->setFile( "//home//triold//data//rgaia2_27.fits" );
+    f->writeFitsFile();
 
-    cout << part27.writeToFile( "//home//triold//data//newGaia2_27.txt" ) << endl;
-
+    cout << "Test2" << endl;
 
     return 0;
 }
+
+

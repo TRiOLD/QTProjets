@@ -43,7 +43,8 @@ private:
 protected:
     void _init()
     {
-        m_header = "RA\tDEC\tmuRA\tmuDEC\teRA\teDEC\teMuRA\teMuDEC\tMAG\tQUALITY\n";
+        m_header =
+        "RA\tDEC\tmuRA\tmuDEC\teRA\teDEC\teMuRA\teMuDEC\tPLX\tMAG\tQUALITY\n";
     }
 
 public:
