@@ -5,231 +5,191 @@ Program::Program()
 
 }
 
+
 Program::Program( S32 argc, C8* argv[] )
 {
-	for( S32 i = 0; i < argc; i++ )
-		args.push_back( string( argv[i] ) );
+    for( S32 i = 0; i < argc; i++ )
+        args.push_back( string( argv[i] ) );
 }
+
 
 Program::~Program()
 {
 
 }
 
+
 void Program::initialize()
 {
     if( args.size() == 1 )
     {
-        args.push_back( "D:\\.gaia_files\\" );
-        args.push_back( "D:\\.gaia_files\\GCC\\" );
+        args.push_back( "/home/triold/data/" );
+        args.push_back( "/home/triold/data/" );
         args.push_back( "27" );
         args.push_back( "27" );
     }
 }
+
 
 void Program::shutdown()
 {
 
 }
 
+
 void Program::process()
 {
-    cout << "=== Start processing ===" << endl << endl;
+    cout << "===== Start processing =====" << endl << endl;
 
-    Catalog * gaiaGlobularClaster;
+    const S32 X = 1000;
+    const S32 Y = 1000;
+    const string prefix = "rgaia2_";
 
     int n = stoi( args[3] );
     int N = stoi( args[4] );
     while( n <= N )
     {
-        D64 t0 = (double)clock() / 1000;
-
-        Catalog * gaiaPixel;
-        Catalog * starsIngaiaGlobularClaster;
+        D64 t0 = (D64)clock() / CLOCKS_PER_SEC;
 
         cout << "Opening and reading catalog... ";
-        string pathgaiaFile = args[1] + "gaia2_" + to_string( n ) + ".txt";
-        PRC.FILENAME = pathgaiaFile;
-        PRC.PATHTOFILE = args[2];
-        gaiaPixel = new Catalog();
-        if( !gaiaPixel->readFile_gaiaPart( pathgaiaFile ) )
+        string pathFileRead = args[1] + prefix + to_string( n ) + ".txt";
+        string pathFileWrite = args[2] + prefix + to_string( n );
+        CatalogGAIA2 partCat;
+        if( !partCat.readFile( pathFileRead ) )
         {
             cout << "Error!!! File not found." << endl;
-            return;
+            cout << "(" << pathFileRead.c_str() << ")" << endl << endl;
+            continue;
         }
-        else cout << "Done." << endl;
-        cout << " - File: " << pathgaiaFile.c_str() << endl;
-        cout << " - Objects = " << gaiaPixel->getObjectCount() << endl;
-        D64 t1 = (D64)clock() / 1000;
-        cout << " - Runtime = " << t1 - t0 << " ( " << t1 << " )"  << endl;
-
-        cout << "Searching globular clusters... ";
-        gaiaGlobularClaster = PRC.dedectedGlobularClasters( gaiaPixel );
-        cout << "Done." << endl;
-        cout << " - Objects = " << gaiaGlobularClaster->getObjectCount() << endl;
-        D64 t2 = (D64)clock() / 1000;
-        cout << " - Runtime = " << t2 - t1 << " ( " << t2 << " )"  << endl;
-
-
- /*       cout << "Search stars in the clusters..." << endl;
-        for( U32 i = 0; i < gaiaGlobularClaster->getObjectCount(); i++ )
+        else
         {
-            cout << "Cluster #" << i + 1 << " of " << gaiaGlobularClaster->getObjectCount() << "... ";
-            string globularClusterFile = "gaia_" + to_string( n ) + "_cl_" + to_string( i + 1 ) + ".txt";
-            CelestialBody * cluster = gaiaGlobularClaster->getObject( i );
- //         starsIngaiaGlobularClaster = PRC.123( gaiaPixel, cluster );
             cout << "Done." << endl;
-            cout << " - Number of objects: " << starsIngaiaGlobularClaster->getObjectCount() << endl;
-            cout << " - Writing catalog to file: " << globularClusterFile << endl;
-        }*/
+            cout << " - File: " << pathFileRead.c_str() << endl;
+            cout << " - Objects = " << partCat.getObjCount() << endl;
+            D64 t1 = (D64)clock() / CLOCKS_PER_SEC;
+            cout << " - Runtime = " << t1 - t0 << " ( " << t1 << " )"  << endl;
 
+            cout << "Start data processing... ";
+            ////////////////////////////////////////////////////////////////////////
+            matrix<F32> * DATA = partCat.CRTmatrixOfThis( Y, X );
 
-        cout << "Writing catalog of Globular Clasters to file... ";
-        string pathgaiaGCFile = args[2] + "gaiaGC_" + to_string( n ) + ".txt";
-        gaiaGlobularClaster->writeToFile( pathgaiaGCFile );
-        cout << "Done." << endl;
-        cout << " - File: " << pathgaiaGCFile << endl;
+            Fits fits;
+            fits.setFile( pathFileWrite + "_data0_START.fits" );
+            fits.setPtrDATA( DATA );
+            fits.writeFitsFile();
 
-        cout << "==========" << endl << endl;
+            ////////////////////////////////////////////////////////////////////////
+            cout << 1 << ".. ";
+            matrix<F32> * interDATA = AlgMatrix::CRTdeviations_allX( DATA );
+            matrix<F32> * interDATA2 = new matrix<F32>( Y, X );
+            for( S32 j = 0; j < Y; j++ )
+                for( S32 i = 0; i < X; i++ )
+                {
+                   (*interDATA2)[j][i] = (*DATA)[j][i];
+                   (*interDATA2)[j][i] -= (*interDATA)[j][i];
+                    if( (*interDATA2)[j][i] < 0.0f )  (*interDATA2)[j][i] = 0.0f;
+                }
 
-        delete gaiaPixel;
-        delete gaiaGlobularClaster;
+            fits.setFile( pathFileWrite + "_data1_DEV2.fits" );
+            fits.setPtrDATA( interDATA );
+            fits.writeFitsFile();
+
+            fits.setFile( pathFileWrite + "_data1_DATA-DEV2.fits" );
+            fits.setPtrDATA( interDATA2 );
+            fits.writeFitsFile();
+
+            delete interDATA;
+
+            ////////////////////////////////////////////////////////////////////////
+            cout << 2 << ".. ";
+            interDATA = AlgMatrix::CRTsmooth_X( interDATA2, 200 );
+            for( S32 j = 0; j < Y; j++ )
+                for( S32 i = 0; i < X; i++ )
+                {
+                    if( (*interDATA)[j][i] != 0 )
+                        (*DATA)[j][i] /= (*interDATA)[j][i];
+                    else (*DATA)[j][i] = 0.0f;
+                    (*interDATA)[j][i] *= 100;
+                }
+
+            fits.setFile( pathFileWrite + "_data2_SMOOTH.fits" );
+            fits.setPtrDATA( interDATA );
+            fits.writeFitsFile();
+
+            fits.setFile( pathFileWrite + "_data2_DATA-SMOOTH.fits" );
+            fits.setPtrDATA( DATA );
+            fits.writeFitsFile();
+
+            delete interDATA;
+            delete interDATA2;
+
+            ////////////////////////////////////////////////////////////////////////
+         /* cout << 3 << ".. ";
+            interDATA = normalization2( DATA );
+            delete DATA;    DATA = interDATA;
+            for( S32 j = 0; j < Y; j++ )
+                for( S32 i = 0; i < X; i++ )
+                    (*DATA)[j][i] *= (*DATA)[j][i];
+
+            fits.setFile( PATHTOFILE + "_data3_NORM.fits" );
+            fits.setDATA( DATA );
+            fits.writeFitsFile(); */
+
+            ////////////////////////////////////////////////////////////////////////
+            cout << 3 << ".. ";
+            interDATA = AlgMatrix::CRTfilter_justFilter( DATA, 7 );
+            for( S32 j = 0; j < Y; j++ )
+                for( S32 i = 0; i < X; i++ )
+                {
+                    (*DATA)[j][i] -= (*interDATA)[j][i];
+                    if( (*DATA)[j][i] < 0.0f ) (*DATA)[j][i] = 0.0f;
+
+                    (*interDATA)[j][i] *= 100;
+                }
+
+            fits.setFile( pathFileWrite + "_data3_FILTER.fits" );
+            fits.setPtrDATA( interDATA );
+            fits.writeFitsFile();
+
+            fits.setFile( pathFileWrite + "_data3_DATA-FILTER.fits" );
+            fits.setPtrDATA( DATA );
+            fits.writeFitsFile();
+
+            delete interDATA;
+
+            ////////////////////////////////////////////////////////////////////////
+            cout << 4 << ".. ";
+            interDATA = AlgMatrix::CRTconvolution_withGauss( DATA, 10 );
+            delete DATA; DATA = interDATA;
+
+            fits.setFile( pathFileWrite + "_data4_DATACONVOL.fits" );
+            fits.setPtrDATA( DATA );
+            fits.writeFitsFile();
+
+            cout << "Done." << endl;
+
+            ////////////////////////////////////////////////////////////////////////
+            cout << "Start creating catalogGC... ";
+            CatalogMyGC partCatalogGC;
+            vector<PictureObject> globularClasters;
+            globularClasters = AlgMatrix::searcherPictureObjects( DATA );
+            partCatalogGC.addObjects( globularClasters, n, 0, X, 0, Y,
+                    partCat.minRa, partCat.maxRa, partCat.minDec, partCat.maxDec );
+            partCatalogGC.writeToFile( pathFileWrite + "_CatalogCG.txt" );
+            delete DATA;
+
+            cout << "Done." << endl;
+            cout << " - Globular Clasters: " << globularClasters.size() << endl;
+            cout << " - File: " << pathFileWrite.c_str() << "_CatalogCG.txt" << endl;
+
+            D64 t2 = (D64)clock() / CLOCKS_PER_SEC;
+            cout << " - Runtime = " << t2 - t1 << " ( " << t2 << " )"  << endl;
+            cout << "==========" << endl << endl;
+
+            ////////////////////////////////////////////////////////////////////////
+        }
         n++;
     }
-
-    cout << endl << "All runtime = " << (D64)clock() / 1000 << "." << endl;
-    cout << "== Process completed ===" << endl;
+    cout << endl << "All runtime = " << (D64)clock() / CLOCKS_PER_SEC << "." << endl;
+    cout << "==== Process completed =====" << endl;
 }
-
-/*
-void Program::process()
-    {
-        cout << "=== Start processing ===" << endl << endl;
-
-        int n = stoi( args[3] );
-        int N = stoi( args[4] );
-        while( n <= N )
-        {
-            D64 t0 = (double)clock() / 1000;
-
-            Catalog * gaiaPixel;
-            Fits * fits;
-
-            cout << "Opening and reading catalog... ";
-            string pathgaiaFile = args[1] + "gaia_" + to_string( n ) + ".txt";
-            gaiaPixel = new Catalog();
-            if( !gaiaPixel->readFile_gaiaPart( pathgaiaFile ) )
-            {
-                cout << "File not found." << endl;
-                cout << " - File: " << pathgaiaFile << endl;
-                delete gaiaPixel;
-            }
-            else
-            {
-                cout << "Done." << endl;
-                cout << " - File: " << pathgaiaFile << endl;
-                cout << " - Objects = " << gaiaPixel->getObjectCount() << endl;
-                D64 t1 = (D64)clock() / 1000;
-                cout << " - Runtime = " << t1 - t0 << " ( " << t1 << " )"  << endl;
-
-                cout << "Create FITS... ";
-                fits = PRC.catalogueToFits( gaiaPixel );
-                fits->setFile( pathgaiaFile + ".fits" );
-                fits->writeFitsFile();
-                cout << "Done." << endl;
-                D64 t2 = (D64)clock() / 1000;
-                cout << " - Runtime = " << t2 - t1 << " ( " << t2 << " )"  << endl;
-
-                cout << "==========" << endl << endl;
-
-                delete gaiaPixel;
-                delete fits;
-            }
-            n++;
-
-        }
-
-
-    cout << endl << "All runtime = " << (D64)clock() / 1000 << "." << endl;
-    cout << "== Process completed ===" << endl;
-}*/
-
-
-/* void Program::process()
- {
-     cout << "=== Start processing ===" << endl << endl;
-
-     Catalog * gaiaGlobularClaster = new Catalog();
-
-     int n = stoi( args[3] );
-     int N = stoi( args[4] );
-     while( n <= N )
-     {
-         D64 t0 = (double)clock() / 1000;
-
-         Catalog * gaiaPixelGC;
-         cout << "Opening and reading catalog... ";
-         string pathFile = args[1] + "gaiaGC_" + to_string( n ) + ".txt";
-         gaiaPixelGC = new Catalog();
-         if( !gaiaPixelGC->readFile( pathFile ) )
-         {
-             cout << "File not found." << endl;
-             cout << " - File: " << pathFile << endl;
-             delete gaiaPixelGC;
-         }
-         else
-         {
-             cout << "Done." << endl;
-             cout << " - File: " << pathFile << endl;
-             cout << " - Objects = " << gaiaPixelGC->getObjectCount() << endl;
-             D64 t1 = (D64)clock() / 1000;
-             cout << " - Runtime = " << t1 - t0 << " ( " << t1 << " )"  << endl;
-
-             gaiaGlobularClaster->addObjects( gaiaPixelGC );
-
-             cout << "==========" << endl << endl;
-
-             delete gaiaPixelGC;
-         }
-         n++;
-
-     }
-     gaiaGlobularClaster->writeToFile( "gaiaGlobularClaster.txt" );
-
-     cout << endl << "All runtime = " << (D64)clock() / 1000 << "." << endl;
-     cout << "== Process completed ===" << endl;
-
- }*/
-
-
-/*
-void Program::process()
- {
-     cout << "=== Start processing ===" << endl << endl;
-     D64 t0 = (double)clock() / 1000;
-
-     Catalog * gaiaGlobularClaster = new Catalog();
-     cout << "Opening and reading catalog... ";
-     string pathFile1 = args[1];
-
-     if( !gaiaGlobularClaster->readFile( pathFile1 ) )
-     {
-         cout << "File not found." << endl;
-         cout << " - File: " << pathFile1 << endl;
-         delete gaiaGlobularClaster;
-
-         return;
-     }
-     cout << "Done." << endl;
-     D64 t1 = (double)clock() / 1000;
-     cout << " - Runtime = " << t1 - t0 << " ( " << t1 << " )"  << endl;
-
-     cout << "gaia clasteroider processing... " << endl;
-     string pathFile2 = args[2];
-     PRC.intrFunction( gaiaGlobularClaster, pathFile2 );
-
-
-     cout << endl << "All runtime = " << (D64)clock() / 1000 << "." << endl;
-     cout << "== Process completed ===" << endl;
- }
-*/

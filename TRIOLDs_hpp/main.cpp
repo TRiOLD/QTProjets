@@ -191,7 +191,7 @@ int main()
     cout << "Test" << endl;
 
     matrix<float> * DATA0 = part27.CRTmatrixOfThis( 1000, 1000 );
-    matrix<float> * DATA1 = CRTsmooth_X( DATA0, 200 );
+/*    matrix<float> * DATA1 = CRTsmooth_X( DATA0, 200 );
     matrix<float> * DATA2 = new matrix<float>( 1000, 1000 );
     for( int j = 0; j < 1000; j++ )
         for( int i = 0; i < 1000; i++ )
@@ -206,7 +206,9 @@ int main()
     fits2.setFile( "//home//triold//data//rgaia2_2_data-smooth.fits" );
     fits0.writeFitsFile();
     fits1.writeFitsFile();
-    fits2.writeFitsFile();
+    fits2.writeFitsFile();*/
+
+    delete DATA0;
 
     cout << "Test2" << endl;
 

@@ -3,7 +3,7 @@
 #define Improvments_h
 
 ////////////////////////////////////
-#define _CRT_SECURE_NO_WARNINGS
+//#define _CRT_SECURE_NO_WARNINGS
 
 #include <iostream>
 #include <fstream>
@@ -23,20 +23,12 @@
 #include <cmath>
 #include <ctime>
 
-#include <byTRiOLD/MathMatrix.h>
-
 using namespace std;
 
 ////////////////////////////////////
 #define PI   3.1415926535
 
-#define KERNEL_SIZE 10
-#define MATRIX_SIZE 1000
-#define CLASTER_RAD 0.005
-
 ////////////////////////////////////
-
-
 typedef vector<string> STRS;	// String
 typedef short int S16;			// short signed int 16 bit
 typedef	unsigned short int U16;	// short unsigned int 16 bit
@@ -49,27 +41,6 @@ typedef float F32;				// float 32 bit
 typedef	double D64;				// double 64 bit
 
 typedef	long double O64;		// overal type
-
-
-template <typename voidtype>
-struct MATRIX	
-{
-	U16 m_x;
-	U16 m_y;
-	vector<vector<voidtype>> m_data;
-
-	MATRIX(){}
-	MATRIX( U16 r, U16 c )	
-	{
-		m_x = c;
-		m_y = r;
-
-		m_data = vector<vector<voidtype>>( r, vector<voidtype>( c ) );
-	}
-
-	vector<voidtype> & operator [] ( U16 n )
-    {return this->m_data[n];}
-};
 
 ////////////////////////////////////
 #endif
