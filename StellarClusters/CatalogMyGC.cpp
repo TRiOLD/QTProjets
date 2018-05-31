@@ -14,12 +14,11 @@ void CatalogMyGC::addObjects( vector<PictureObject> spots, S32 numPart,
     m_objects.resize( k0 + spots.size() );
     for( S32 k = 0; k < S32(spots.size()); k++ )
     {
-        PictureObject s = spots[k];
-        s.calculateMinMaxDotsParams();
-        S32 sizeX = s.maxX - s.minX;
-        S32 sizeY = s.maxY - s.minY;
-        S32 X = sizeX / 2 + s.minX;
-        S32 Y = sizeY / 2 + s.minY;
+        spots[k].calculateMinMaxDotsParams();
+        S32 sizeX = s.maxX - spots[k].minX;
+        S32 sizeY = s.maxY - spots[k].minY;
+        S32 X = sizeX / 2 + spots[k].minX;
+        S32 Y = sizeY / 2 + spots[k].minY;
         S32 Z = s.maxZ;
         D64 Ra = X * (maxA - minA) / (maxX - minX) + minA;
         D64 Dec = Y * (maxB - minB) / (maxY - minY) + minB;
