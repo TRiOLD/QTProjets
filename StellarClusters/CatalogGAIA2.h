@@ -3,8 +3,8 @@
 
 #include "Improvements.h"
 #include "Astronomy/Fits.h"
-#include "Astronomy/Сatalog.h"
-#include "Astronomy/СelestialBody.h"
+#include "Astronomy/Catalog.h"
+#include "Astronomy/CelestialBody.h"
 #include "matrix.h"
 
 class CatalogGAIA2 : public Catalog

@@ -2,8 +2,8 @@
 #define CATALOGMYGC_H
 
 #include "Improvements.h"
-#include "Astronomy/Сatalog.h"
-#include "Astronomy/СelestialBody.h"
+#include "Astronomy/Catalog.h"
+#include "Astronomy/CelestialBody.h"
 #include "Algorithms.h"
 #include "PictureObject.h"
 
