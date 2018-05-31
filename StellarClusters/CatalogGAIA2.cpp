@@ -45,6 +45,40 @@ bool CatalogGAIA2::readFile( string fileName )
 }
 
 
+bool CatalogGAIA2::readFile_RaDec( string fileName )
+{
+
+    fstream file;
+    file.open( fileName, ios_base::in );
+    if( !file.is_open() )   return false;
+
+    U32 rows = 0;
+    string fileString;
+    getline( file, fileString );
+    const U32 colms = 3;
+    while( getline( file, fileString ) )
+        rows++;
+
+    m_header = "RA\tDEC\n";
+    m_objects.resize( colms - 1 );
+
+    file.close();   m_objects.resize( rows+1 );
+    file.open( fileName, ios_base::in );
+
+    S32 k = 0;
+    while( getline( file, fileString ) )
+    {
+        strings W = Algorithms::divideByWordsSrting( fileString, colms );
+        m_objects[k].setParam( stod( W[0] ), RA );
+        m_objects[k].setParam( stod( W[1] ), DEC );
+        k++;
+    }
+
+    file.close();
+    return true;
+}
+
+
 matrix<F32> * CatalogGAIA2::CRTmatrixOfThis( S32 Y, S32 X )
 {
     matrix<F32> * resData = new matrix<F32>( Y, X );

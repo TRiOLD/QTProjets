@@ -3,8 +3,8 @@
 
 #include "Improvements.h"
 #include "Astronomy/Fits.h"
-#include "Astronomy/Сatalog.h"
-#include "Astronomy/СelestialBody.h"
+#include "Astronomy/Catalog.h"
+#include "Astronomy/CelestialBody.h"
 #include "CatalogGAIA2.h"
 #include "CatalogMyGC.h"
 #include "matrix.h"

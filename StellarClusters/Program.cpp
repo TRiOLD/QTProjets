@@ -25,6 +25,8 @@ void Program::initialize()
     {
         args.push_back( "/home/triold/data/" );
         args.push_back( "/home/triold/data/" );
+    //  args.push_back( "D:\\.gaia_files\\" );
+    //  args.push_back( "D:\\.gaia_files\\GCC\\" );
         args.push_back( "27" );
         args.push_back( "27" );
     }
@@ -55,11 +57,10 @@ void Program::process()
         string pathFileRead = args[1] + prefix + to_string( n ) + ".txt";
         string pathFileWrite = args[2] + prefix + to_string( n );
         CatalogGAIA2 partCat;
-        if( !partCat.readFile( pathFileRead ) )
+        if( !partCat.readFile_RaDec( pathFileRead ) )
         {
             cout << "Error!!! File not found." << endl;
             cout << "(" << pathFileRead.c_str() << ")" << endl << endl;
-            continue;
         }
         else
         {

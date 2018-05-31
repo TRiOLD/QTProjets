@@ -15,8 +15,8 @@ HEADERS += \
     Algorithms.h \
     MathMatrix.h \
     matrix.h \
-    Astronomy/Сatalog.h \
-    Astronomy/СelestialBody.h \
+    Astronomy/Catalog.h \
+    Astronomy/CelestialBody.h \
     Astronomy/Fits.h \
     CatalogGAIA2.h \
     Program.h \
