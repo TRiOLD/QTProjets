@@ -2,7 +2,8 @@
 
 CatalogMyGC::CatalogMyGC()
 {
-    m_header = "Part\tN\tSizeX\tSizeY\tX\tY\tZ\tRA\tDEC\n";
+    m_header = "Part\tN\tSizeX\tSizeY\tX\tY\tZ\tRA\tDEC\tsizeRA\tsizeDEC\n";
+    m_params = 11;
 }
 
 
@@ -15,13 +16,15 @@ void CatalogMyGC::addObjects( vector<PictureObject> spots, S32 numPart,
     for( S32 k = 0; k < S32(spots.size()); k++ )
     {
         spots[k].calculateMinMaxDotsParams();
-        S32 sizeX = spots[k].maxX - spots[k].minX;
-        S32 sizeY = spots[k].maxY - spots[k].minY;
+        S32 sizeX = spots[k].maxX - spots[k].minX + 1;
+        S32 sizeY = spots[k].maxY - spots[k].minY + 1;
         S32 X = sizeX / 2 + spots[k].minX;
         S32 Y = sizeY / 2 + spots[k].minY;
         S32 Z = spots[k].maxZ;
         D64 Ra = X * (maxA - minA) / (maxX - minX) + minA;
         D64 Dec = Y * (maxB - minB) / (maxY - minY) + minB;
+        D64 dRa = sizeX * (maxA - minA) / (maxX - minX);
+        D64 dDec = sizeY * (maxB - minB) / (maxY - minY);
 
         m_objects[k0+k].setParam( numPart , 0 );
         m_objects[k0+k].setParam( k0+k + 1 , 1 );
@@ -32,13 +35,51 @@ void CatalogMyGC::addObjects( vector<PictureObject> spots, S32 numPart,
         m_objects[k0+k].setParam( Z , 6 );
         m_objects[k0+k].setParam( Ra , 7 );
         m_objects[k0+k].setParam( Dec , 8 );
+        m_objects[k0+k].setParam( dRa , 9 );
+        m_objects[k0+k].setParam( dDec , 10 );
     }
+}
+
+
+void CatalogMyGC::pushBack( CatalogMyGC * cat )
+{
+    S32 N = cat->getObjCount() - 1; //Костыль!!!
+    S32 I0 = getObjCount();
+    S32 I = I0 + N;
+    m_objects.resize( I0 + N );
+    for( S32 i = I0, j = 0; i < I; i++, j++ )
+            m_objects[i] = *(cat->getObj( j ));
 }
 
 
 bool CatalogMyGC::readFile( string fileName )
 {
+    std::fstream file;
+    file.open( fileName, std::ios_base::in );
+    if( !file.is_open() )   return false;
 
+    unsigned int rows = 0;
+    std::string fileString;
+    while( std::getline( file, fileString ) )
+        rows++;
+
+    file.close();   m_objects.resize( rows );
+    file.open( fileName, std::ios_base::in );
+
+    std::getline( file, fileString );
+    unsigned int colms = Algorithms::calculateWordsInSrting( fileString );
+
+    unsigned int k = 0;
+    while( std::getline( file, fileString ) )
+    {
+        strings W = Algorithms::divideByWordsSrting( fileString, colms );
+        for( int i = 0; i < m_params; i++ )
+            m_objects[k].setParam( stod( W[i] ), i );
+        k++;
+    }
+
+    file.close();
+    return true;
 }
 
 
@@ -62,7 +103,7 @@ bool CatalogMyGC::writeToFile( string fileName )
             file << std::fixed << std::setprecision( 0 )
                  << value << "\t";
         }
-        for( int i = 7; i < 9; i++ )
+        for( int i = 7; i < m_params; i++ )
         {
             double value = m_objects[k].getParam( i );
             file << std::fixed << std::setprecision( 10 )

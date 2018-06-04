@@ -27,7 +27,8 @@ private:
 public:
     void initialize();
     void shutdown();
-    void process();
+    void process0();
+    void process1();
 };
 
 #endif // PROGRAM_H

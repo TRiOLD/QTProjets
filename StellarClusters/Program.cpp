@@ -23,12 +23,12 @@ void Program::initialize()
 {
     if( args.size() == 1 )
     {
+        args.push_back( "/home/triold/data/cats/" );
         args.push_back( "/home/triold/data/" );
-        args.push_back( "/home/triold/data/" );
-    //  args.push_back( "D:\\.gaia_files\\" );
-    //  args.push_back( "D:\\.gaia_files\\GCC\\" );
-        args.push_back( "27" );
-        args.push_back( "27" );
+   //   args.push_back( "D:\\.gaia_files\\" );
+   //   args.push_back( "D:\\.gaia_files\\GCC\\" );
+        args.push_back( "0" );
+        args.push_back( "1131" );
     }
 }
 
@@ -39,7 +39,7 @@ void Program::shutdown()
 }
 
 
-void Program::process()
+void Program::process0()
 {
     cout << "===== Start processing =====" << endl << endl;
 
@@ -191,6 +191,55 @@ void Program::process()
         }
         n++;
     }
+    cout << endl << "All runtime = " << (D64)clock() / CLOCKS_PER_SEC << "." << endl;
+    cout << "==== Process completed =====" << endl;
+}
+
+
+void Program::process1()
+{
+    cout << "===== Start stitch processing =====" << endl << endl;
+
+    const string prefix = "rgaia2_";
+    const string postfix = "_CatalogCG.txt";
+
+    CatalogMyGC CatalogGC;
+    CatalogMyGC CatalogPartGC;
+
+    int n = stoi( args[3] );
+    int N = stoi( args[4] );
+
+    while( n <= N )
+    {
+        cout << "Opening and reading catalog... ";
+        string pathFileRead = args[1] + prefix + to_string( n ) + postfix;
+        if( !CatalogPartGC.readFile( pathFileRead ) )
+        {
+            cout << "Error!!! File not found." << endl;
+            cout << "(" << pathFileRead.c_str() << ")" << endl << endl;
+        }
+        else
+        {
+            cout << "Done." << endl;
+            cout << " - File: " << pathFileRead.c_str() << endl;
+            cout << " - Objects = " << CatalogPartGC.getObjCount() << endl;
+
+            cout << "Pushing catalog... ";
+            CatalogGC.pushBack( &CatalogPartGC );
+            cout << "Done." << endl;
+            cout << "==========" << endl << endl;
+        }
+        n++;
+    }
+
+    cout << "Wreating full catalogGC... ";
+    string pathFileWrite = args[2] + prefix + "AllGlobularClasters.txt";
+    CatalogGC.writeToFile( pathFileWrite );
+
+    cout << "Done." << endl;
+    cout << " - All Globular Clasters: " << CatalogGC.getObjCount() << endl;
+    cout << " - File: " << pathFileWrite.c_str() << endl;
+
     cout << endl << "All runtime = " << (D64)clock() / CLOCKS_PER_SEC << "." << endl;
     cout << "==== Process completed =====" << endl;
 }

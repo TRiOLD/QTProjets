@@ -108,6 +108,17 @@ matrix<F32> * AlgMatrix::CRTdeviations_allX( matrix<F32> * data )
 }
 
 
+matrix<F32> * AlgMatrix::CRTdeviations_Gauss( matrix<F32> * data, U16 coreSize )
+{
+    const S32 X = data->getSizeX(), Y = data->getSizeY();
+    matrix<F32> * resData = new matrix<F32>( Y, X );
+
+    // Подумать и написать хитрую штуку с корреляцией Гаусса по всему массиву!
+
+    return resData;
+}
+
+
 matrix<F32> * AlgMatrix::CRTsmooth_X( matrix<F32> * data, U16 coreSize )
 {
     const S32 X = data->getSizeX(), Y = data->getSizeY();
@@ -165,15 +176,14 @@ matrix<F32> * AlgMatrix::CRTfilter_justFilter( matrix<F32> * data, U16 coreSize 
     const U16 cSizeL = coreSize * coreSize;
     const S32 halfL = S32(coreSize / 2.0 + 0.5);
 
-    const S32 N = 1000;
+    const S32 N = X * Y; S32 n = 0;
     vector<F32> mainCore( N );
-    for( int i = 0; i < N; i++ )
-    {
-        S32 itX = rand() % X;
-        S32 itY = rand() % Y;
-        mainCore[i] = (*data)[itY][itX];
-    }
-
+    for( S32 j = 0; j < Y; j++ )
+        for( S32 i = 0; i < X; i++ )
+        {
+            mainCore[n] = (*data)[j][i];
+            n++;
+        }
     D64 mainSerSum = average( mainCore, N );
 
     const D64 dev = 0.6;

@@ -12,6 +12,7 @@ class AlgMatrix : public Algorithms
 public:
     static matrix<F32> * CRTgradient_OLSq2( matrix<F32> * data );
     static matrix<F32> * CRTdeviations_allX( matrix<F32> * data );
+    static matrix<F32> * CRTdeviations_Gauss( matrix<F32> * data );
     static matrix<F32> * CRTsmooth_X( matrix<F32> * data, U16 coreSize );
     static matrix<F32> * CRTfilter_justFilter( matrix<F32> * data, U16 coreSize );
     static matrix<F32> * CRTconvolution_withGauss( matrix<F32> * data, U16 coreSize );
