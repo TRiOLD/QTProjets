@@ -3,7 +3,10 @@
 CatalogMyGC::CatalogMyGC()
 {
     m_header = "Part\tN\tSizeX\tSizeY\tX\tY\tZ\tRA\tDEC\tsizeRA\tsizeDEC\n";
+<<<<<<< HEAD
     m_params = 11;
+=======
+>>>>>>> c7cd5575a327f6c3a744c7211c96da60f89d8b9c
 }
 
 
@@ -103,7 +106,11 @@ bool CatalogMyGC::writeToFile( string fileName )
             file << std::fixed << std::setprecision( 0 )
                  << value << "\t";
         }
+<<<<<<< HEAD
         for( int i = 7; i < m_params; i++ )
+=======
+        for( int i = 7; i < 11; i++ )
+>>>>>>> c7cd5575a327f6c3a744c7211c96da60f89d8b9c
         {
             double value = m_objects[k].getParam( i );
             file << std::fixed << std::setprecision( 10 )
