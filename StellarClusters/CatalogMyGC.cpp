@@ -2,7 +2,7 @@
 
 CatalogMyGC::CatalogMyGC()
 {
-    m_header = "Part\tN\tSizeX\tSizeY\tX\tY\tZ\tRA\tDEC\n";
+    m_header = "Part\tN\tSizeX\tSizeY\tX\tY\tZ\tRA\tDEC\tsizeRA\tsizeDEC\n";
 }
 
 
@@ -15,13 +15,15 @@ void CatalogMyGC::addObjects( vector<PictureObject> spots, S32 numPart,
     for( S32 k = 0; k < S32(spots.size()); k++ )
     {
         spots[k].calculateMinMaxDotsParams();
-        S32 sizeX = spots[k].maxX - spots[k].minX;
-        S32 sizeY = spots[k].maxY - spots[k].minY;
+        S32 sizeX = spots[k].maxX - spots[k].minX + 1;
+        S32 sizeY = spots[k].maxY - spots[k].minY + 1;
         S32 X = sizeX / 2 + spots[k].minX;
         S32 Y = sizeY / 2 + spots[k].minY;
         S32 Z = spots[k].maxZ;
         D64 Ra = X * (maxA - minA) / (maxX - minX) + minA;
         D64 Dec = Y * (maxB - minB) / (maxY - minY) + minB;
+        D64 dRa = sizeX * (maxA - minA) / (maxX - minX);
+        D64 dDec = sizeY * (maxB - minB) / (maxY - minY);
 
         m_objects[k0+k].setParam( numPart , 0 );
         m_objects[k0+k].setParam( k0+k + 1 , 1 );
@@ -32,6 +34,8 @@ void CatalogMyGC::addObjects( vector<PictureObject> spots, S32 numPart,
         m_objects[k0+k].setParam( Z , 6 );
         m_objects[k0+k].setParam( Ra , 7 );
         m_objects[k0+k].setParam( Dec , 8 );
+        m_objects[k0+k].setParam( dRa , 9 );
+        m_objects[k0+k].setParam( dDec , 10 );
     }
 }
 
@@ -62,7 +66,7 @@ bool CatalogMyGC::writeToFile( string fileName )
             file << std::fixed << std::setprecision( 0 )
                  << value << "\t";
         }
-        for( int i = 7; i < 9; i++ )
+        for( int i = 7; i < 11; i++ )
         {
             double value = m_objects[k].getParam( i );
             file << std::fixed << std::setprecision( 10 )

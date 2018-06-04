@@ -48,6 +48,7 @@ bool CatalogGAIA2::readFile( string fileName )
 bool CatalogGAIA2::readFile_RaDec( string fileName )
 {
 
+    m_header = "RA\tDEC\n";
     fstream file;
     file.open( fileName, ios_base::in );
     if( !file.is_open() )   return false;
@@ -58,9 +59,6 @@ bool CatalogGAIA2::readFile_RaDec( string fileName )
     const U32 colms = 3;
     while( getline( file, fileString ) )
         rows++;
-
-    m_header = "RA\tDEC\n";
-    m_objects.resize( colms - 1 );
 
     file.close();   m_objects.resize( rows+1 );
     file.open( fileName, ios_base::in );

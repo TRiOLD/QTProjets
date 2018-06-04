@@ -23,12 +23,12 @@ void Program::initialize()
 {
     if( args.size() == 1 )
     {
-        args.push_back( "/home/triold/data/" );
-        args.push_back( "/home/triold/data/" );
-    //  args.push_back( "D:\\.gaia_files\\" );
-    //  args.push_back( "D:\\.gaia_files\\GCC\\" );
-        args.push_back( "27" );
-        args.push_back( "27" );
+     // args.push_back( "/home/triold/data/" );
+    //  args.push_back( "/home/triold/data/" );
+        args.push_back( "D:\\.gaia_files\\" );
+        args.push_back( "D:\\.gaia_files\\GCC\\" );
+        args.push_back( "430" );
+        args.push_back( "430" );
     }
 }
 
