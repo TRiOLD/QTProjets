@@ -21,9 +21,6 @@ public:
                      S32 minX, S32 maxX, S32 minY, S32 maxY,
                      D64 minA, D64 maxA, D64 minB, D64 maxB );
 
-    void pushBack( CelestialBody body );
-    void pushBack( CatalogMyGC * cat );
-
     virtual bool readFile( string fileName );
     virtual bool writeToFile( string fileName );
 };

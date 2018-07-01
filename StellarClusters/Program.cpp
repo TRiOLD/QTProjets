@@ -286,3 +286,9 @@ void Program::process1()    // Сшивка всех найденных скоп
     cout << endl << "All runtime = " << (D64)clock() / CLOCKS_PER_SEC << "." << endl;
     cout << "==== Process completed =====" << endl;
 }
+
+
+void Program::process2()    // Отделение скоплений от звезд фона
+{
+
+}

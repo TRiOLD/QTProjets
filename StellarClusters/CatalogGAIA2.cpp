@@ -27,14 +27,14 @@ bool CatalogGAIA2::readFile( string fileName )
 
         m_objects[k].setParam( stod( W[0] ), RA );
         m_objects[k].setParam( stod( W[1] ), DEC );
-        m_objects[k].setParam( stod( W[2] ), eRA );
-        m_objects[k].setParam( stod( W[3] ), eDEC );
-        m_objects[k].setParam( stod( W[4] ), PLX );
-        m_objects[k].setParam( stod( W[5] ), ePLX );
-        m_objects[k].setParam( stod( W[6] ), muRA );
-        m_objects[k].setParam( stod( W[7] ), eMuRA );
-        m_objects[k].setParam( stod( W[8] ), muDEC );
-        m_objects[k].setParam( stod( W[9] ), eMuDEC );
+        m_objects[k].setParam( stod( W[4] ), eRA ); // Для Part`s с этой строчки += 2
+        m_objects[k].setParam( stod( W[5] ), eDEC );
+        m_objects[k].setParam( stod( W[6] ), PLX );
+        m_objects[k].setParam( stod( W[7] ), ePLX );
+        m_objects[k].setParam( stod( W[8] ), muRA );
+        m_objects[k].setParam( stod( W[9] ), eMuRA );
+        m_objects[k].setParam( stod( W[10] ), muDEC );
+        m_objects[k].setParam( stod( W[11] ), eMuDEC );
         m_objects[k].setParam( stod( W[12] ), MAG );
 
         k++;

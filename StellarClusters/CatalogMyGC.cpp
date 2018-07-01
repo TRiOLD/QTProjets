@@ -48,23 +48,6 @@ void CatalogMyGC::addObjects( vector<PictureObject> spots, S32 numPart,
 }
 
 
-void CatalogMyGC::pushBack( CelestialBody body )
-{
-    m_objects.push_back( body );
-}
-
-
-void CatalogMyGC::pushBack( CatalogMyGC * cat )
-{
-    S32 N = cat->getObjCount() - 1; //Костыль!!!
-    S32 I0 = getObjCount();
-    S32 I = I0 + N;
-    m_objects.resize( I0 + N );
-    for( S32 i = I0, j = 0; i < I; i++, j++ )
-            m_objects[i] = *(cat->getObj( j ));
-}
-
-
 bool CatalogMyGC::readFile( string fileName )
 {
     std::fstream file;

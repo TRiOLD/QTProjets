@@ -8,7 +8,8 @@ SOURCES += main.cpp \
     Program.cpp \
     AlgMatrix.cpp \
     PictureObject.cpp \
-    CatalogMyGC.cpp
+    CatalogMyGC.cpp \
+    Clustering.cpp
 
 HEADERS += \
     Improvements.h \
@@ -22,4 +23,5 @@ HEADERS += \
     Program.h \
     AlgMatrix.h \
     PictureObject.h \
-    CatalogMyGC.h
+    CatalogMyGC.h \
+    Clustering.h
