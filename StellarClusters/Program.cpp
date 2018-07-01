@@ -23,21 +23,13 @@ void Program::initialize()
 {
     if( args.size() == 1 )
     {
-<<<<<<< HEAD
-        args.push_back( "/home/triold/data/cats/" );
-        args.push_back( "/home/triold/data/" );
-   //   args.push_back( "D:\\.gaia_files\\" );
-   //   args.push_back( "D:\\.gaia_files\\GCC\\" );
-        args.push_back( "0" );
-        args.push_back( "1131" );
-=======
+
      // args.push_back( "/home/triold/data/" );
     //  args.push_back( "/home/triold/data/" );
         args.push_back( "D:\\.gaia_files\\" );
         args.push_back( "D:\\.gaia_files\\GCC\\" );
-        args.push_back( "430" );
-        args.push_back( "430" );
->>>>>>> c7cd5575a327f6c3a744c7211c96da60f89d8b9c
+        args.push_back( "0" );
+        args.push_back( "27" );
     }
 }
 
@@ -48,7 +40,7 @@ void Program::shutdown()
 }
 
 
-void Program::process0()
+void Program::process0()    // Обработка пикселей каталога
 {
     cout << "===== Start processing =====" << endl << endl;
 
@@ -90,7 +82,16 @@ void Program::process0()
 
             ////////////////////////////////////////////////////////////////////////
             cout << 1 << ".. ";
-            matrix<F32> * interDATA = AlgMatrix::CRTdeviations_allX( DATA );
+            matrix<F32> * interDATA =  AlgMatrix::CRTnormalization_pow2Max( DATA );
+            delete DATA;    DATA = interDATA;
+
+            fits.setFile( pathFileWrite + "_data1_NORM.fits" );
+            fits.setPtrDATA( DATA );
+            fits.writeFitsFile();
+
+            ////////////////////////////////////////////////////////////////////////
+            cout << 2 << ".. ";
+            interDATA = AlgMatrix::CRTdeviations_allX( DATA );
             matrix<F32> * interDATA2 = new matrix<F32>( Y, X );
             for( S32 j = 0; j < Y; j++ )
                 for( S32 i = 0; i < X; i++ )
@@ -100,53 +101,43 @@ void Program::process0()
                     if( (*interDATA2)[j][i] < 0.0f )  (*interDATA2)[j][i] = 0.0f;
                 }
 
-            fits.setFile( pathFileWrite + "_data1_DEV2.fits" );
+            fits.setFile( pathFileWrite + "_data2_DEV2.fits" );
             fits.setPtrDATA( interDATA );
             fits.writeFitsFile();
 
-            fits.setFile( pathFileWrite + "_data1_DATA-DEV2.fits" );
+            fits.setFile( pathFileWrite + "_data2_DATA-DEV2.fits" );
             fits.setPtrDATA( interDATA2 );
             fits.writeFitsFile();
 
             delete interDATA;
 
             ////////////////////////////////////////////////////////////////////////
-            cout << 2 << ".. ";
+            cout << 3 << ".. ";
             interDATA = AlgMatrix::CRTsmooth_X( interDATA2, 200 );
             for( S32 j = 0; j < Y; j++ )
                 for( S32 i = 0; i < X; i++ )
                 {
-                    if( (*interDATA)[j][i] != 0 )
+                    if( (*interDATA)[j][i] != 0.0f && (*DATA)[j][i] >= 1.0f )
                         (*DATA)[j][i] /= (*interDATA)[j][i];
-                    else (*DATA)[j][i] = 0.0f;
+                    if( (*interDATA)[j][i] == 0.0f )
+                        (*DATA)[j][i] = 0.0f;
                     (*interDATA)[j][i] *= 100;
                 }
 
-            fits.setFile( pathFileWrite + "_data2_SMOOTH.fits" );
+            fits.setFile( pathFileWrite + "_data3_SMOOTH.fits" );
             fits.setPtrDATA( interDATA );
             fits.writeFitsFile();
 
-            fits.setFile( pathFileWrite + "_data2_DATA-SMOOTH.fits" );
+            fits.setFile( pathFileWrite + "_data3_DATA-SMOOTH.fits" );
             fits.setPtrDATA( DATA );
             fits.writeFitsFile();
 
             delete interDATA;
             delete interDATA2;
 
-            ////////////////////////////////////////////////////////////////////////
-         /* cout << 3 << ".. ";
-            interDATA = normalization2( DATA );
-            delete DATA;    DATA = interDATA;
-            for( S32 j = 0; j < Y; j++ )
-                for( S32 i = 0; i < X; i++ )
-                    (*DATA)[j][i] *= (*DATA)[j][i];
-
-            fits.setFile( PATHTOFILE + "_data3_NORM.fits" );
-            fits.setDATA( DATA );
-            fits.writeFitsFile(); */
 
             ////////////////////////////////////////////////////////////////////////
-            cout << 3 << ".. ";
+            cout << 4 << ".. ";
             interDATA = AlgMatrix::CRTfilter_justFilter( DATA, 7 );
             for( S32 j = 0; j < Y; j++ )
                 for( S32 i = 0; i < X; i++ )
@@ -157,22 +148,38 @@ void Program::process0()
                     (*interDATA)[j][i] *= 100;
                 }
 
-            fits.setFile( pathFileWrite + "_data3_FILTER.fits" );
+            fits.setFile( pathFileWrite + "_data4_FILTER.fits" );
             fits.setPtrDATA( interDATA );
             fits.writeFitsFile();
 
-            fits.setFile( pathFileWrite + "_data3_DATA-FILTER.fits" );
+            fits.setFile( pathFileWrite + "_data4_DATA-FILTER.fits" );
             fits.setPtrDATA( DATA );
             fits.writeFitsFile();
 
             delete interDATA;
 
             ////////////////////////////////////////////////////////////////////////
-            cout << 4 << ".. ";
+            cout << 5 << ".. ";
+            interDATA = AlgMatrix::CRTnormalization_justNorm( DATA );
+            delete DATA; DATA = interDATA;
+
+            fits.setFile( pathFileWrite + "_data5_RESNORM.fits" );
+            fits.setPtrDATA( DATA );
+            fits.writeFitsFile();
+
+            ////////////////////////////////////////////////////////////////////////
+            cout << 6 << ".. ";
             interDATA = AlgMatrix::CRTconvolution_withGauss( DATA, 10 );
             delete DATA; DATA = interDATA;
 
-            fits.setFile( pathFileWrite + "_data4_DATACONVOL.fits" );
+            for( S32 j = 0; j < Y; j++ )
+                for( S32 i = 0; i < X; i++ )
+                {
+                    if( (*DATA)[j][i] < 0.0f ) (*DATA)[j][i] = 0.0f;
+                    if( (*DATA)[j][i] > 100.0f ) (*DATA)[j][i] = 100.0f;
+                }
+
+            fits.setFile( pathFileWrite + "_data6_DATACONVOL.fits" );
             fits.setPtrDATA( DATA );
             fits.writeFitsFile();
 
@@ -189,7 +196,7 @@ void Program::process0()
             delete DATA;
 
             cout << "Done." << endl;
-            cout << " - Globular Clasters: " << globularClasters.size() << endl;
+            cout << " - Globular Clasters: " << partCatalogGC.getObjCount() << endl;
             cout << " - File: " << pathFileWrite.c_str() << "_CatalogCG.txt" << endl;
 
             D64 t2 = (D64)clock() / CLOCKS_PER_SEC;
@@ -205,7 +212,7 @@ void Program::process0()
 }
 
 
-void Program::process1()
+void Program::process1()    // Сшивка всех найденных скоплений в один файл
 {
     cout << "===== Start stitch processing =====" << endl << endl;
 
@@ -241,12 +248,39 @@ void Program::process1()
         n++;
     }
 
+    cout << "Fixing full catalogGC... ";
+    CatalogMyGC CatalogGC_Fix;
+    CatalogMyGC CatalogGC_FixDev;
+
+    for( S32 i = 0; i < CatalogGC.getObjCount(); i++ )
+    {
+        S32 repeat = 0;
+        D64 ra0 = CatalogGC.getObj( i )->getParam( 7 ) * 180 / PI;
+        D64 dec0 = CatalogGC.getObj( i )->getParam( 8 ) * 180 / PI;
+        for( S32 j = i + 1; j < CatalogGC.getObjCount(); j++ )
+        {
+            D64 ra = CatalogGC.getObj( j )->getParam( 7 ) * 180 / PI;
+            D64 dec = CatalogGC.getObj( j )->getParam( 8 ) * 180 / PI;
+            if( sqrt( pow( (ra - ra0), 2 ) + pow( (dec - dec0), 2 ) ) < 0.005 )
+            {
+                if( !repeat )
+                    CatalogGC_FixDev.pushBack( *CatalogGC.getObj( i ) );
+                CatalogGC_FixDev.pushBack( *CatalogGC.getObj( j ) );
+                repeat++;
+            }
+        }
+        if( !repeat )
+            CatalogGC_Fix.pushBack( *CatalogGC.getObj( i ) );
+    }
+    cout << "Done." << endl;
+
     cout << "Wreating full catalogGC... ";
-    string pathFileWrite = args[2] + prefix + "AllGlobularClasters.txt";
-    CatalogGC.writeToFile( pathFileWrite );
+    string pathFileWrite = args[2] + prefix + "FIX" + "AllGlobularClasters.txt";
+    CatalogGC_Fix.writeToFile( pathFileWrite );
 
     cout << "Done." << endl;
     cout << " - All Globular Clasters: " << CatalogGC.getObjCount() << endl;
+    cout << " - All FixGlobular Clasters: " << CatalogGC_Fix.getObjCount() << endl;
     cout << " - File: " << pathFileWrite.c_str() << endl;
 
     cout << endl << "All runtime = " << (D64)clock() / CLOCKS_PER_SEC << "." << endl;

@@ -3,10 +3,7 @@
 CatalogMyGC::CatalogMyGC()
 {
     m_header = "Part\tN\tSizeX\tSizeY\tX\tY\tZ\tRA\tDEC\tsizeRA\tsizeDEC\n";
-<<<<<<< HEAD
     m_params = 11;
-=======
->>>>>>> c7cd5575a327f6c3a744c7211c96da60f89d8b9c
 }
 
 
@@ -14,33 +11,46 @@ void CatalogMyGC::addObjects( vector<PictureObject> spots, S32 numPart,
                               S32 minX, S32 maxX, S32 minY, S32 maxY,
                               D64 minA, D64 maxA, D64 minB, D64 maxB )
 {
-    S32 k0 = S32(m_objects.size());
+    S32 k0 = S32(m_objects.size()); S32 k = 0;
     m_objects.resize( k0 + spots.size() );
-    for( S32 k = 0; k < S32(spots.size()); k++ )
+    for( S32 i = 0; i < S32(spots.size()); i++ )
     {
-        spots[k].calculateMinMaxDotsParams();
-        S32 sizeX = spots[k].maxX - spots[k].minX + 1;
-        S32 sizeY = spots[k].maxY - spots[k].minY + 1;
-        S32 X = sizeX / 2 + spots[k].minX;
-        S32 Y = sizeY / 2 + spots[k].minY;
-        S32 Z = spots[k].maxZ;
-        D64 Ra = X * (maxA - minA) / (maxX - minX) + minA;
-        D64 Dec = Y * (maxB - minB) / (maxY - minY) + minB;
-        D64 dRa = sizeX * (maxA - minA) / (maxX - minX);
-        D64 dDec = sizeY * (maxB - minB) / (maxY - minY);
+        spots[i].calculateMinMaxDotsParams();
+        if( spots[i].maxZ > 1 )
+        {
+            S32 sizeX = spots[i].maxX - spots[i].minX + 1;
+            S32 sizeY = spots[i].maxY - spots[i].minY + 1;
+            S32 X = sizeX / 2 + spots[i].minX;
+            S32 Y = sizeY / 2 + spots[i].minY;
+            S32 Z = spots[i].maxZ;
+            D64 Ra = X * (maxA - minA) / (maxX - minX) + minA;
+            D64 Dec = Y * (maxB - minB) / (maxY - minY) + minB;
+            D64 dRa = sizeX * (maxA - minA) / (maxX - minX);
+            D64 dDec = sizeY * (maxB - minB) / (maxY - minY);
 
-        m_objects[k0+k].setParam( numPart , 0 );
-        m_objects[k0+k].setParam( k0+k + 1 , 1 );
-        m_objects[k0+k].setParam( sizeX , 2 );
-        m_objects[k0+k].setParam( sizeY , 3 );
-        m_objects[k0+k].setParam( X , 4 );
-        m_objects[k0+k].setParam( Y , 5 );
-        m_objects[k0+k].setParam( Z , 6 );
-        m_objects[k0+k].setParam( Ra , 7 );
-        m_objects[k0+k].setParam( Dec , 8 );
-        m_objects[k0+k].setParam( dRa , 9 );
-        m_objects[k0+k].setParam( dDec , 10 );
+            m_objects[k0+k].setParam( numPart , 0 );
+            m_objects[k0+k].setParam( k0+k + 1 , 1 );
+            m_objects[k0+k].setParam( sizeX , 2 );
+            m_objects[k0+k].setParam( sizeY , 3 );
+            m_objects[k0+k].setParam( X , 4 );
+            m_objects[k0+k].setParam( Y , 5 );
+            m_objects[k0+k].setParam( Z , 6 );
+            m_objects[k0+k].setParam( Ra , 7 );
+            m_objects[k0+k].setParam( Dec , 8 );
+            m_objects[k0+k].setParam( dRa , 9 );
+            m_objects[k0+k].setParam( dDec , 10 );
+
+            k++;
+        }
     }
+
+    m_objects.resize( k0 + k );
+}
+
+
+void CatalogMyGC::pushBack( CelestialBody body )
+{
+    m_objects.push_back( body );
 }
 
 
@@ -106,11 +116,7 @@ bool CatalogMyGC::writeToFile( string fileName )
             file << std::fixed << std::setprecision( 0 )
                  << value << "\t";
         }
-<<<<<<< HEAD
         for( int i = 7; i < m_params; i++ )
-=======
-        for( int i = 7; i < 11; i++ )
->>>>>>> c7cd5575a327f6c3a744c7211c96da60f89d8b9c
         {
             double value = m_objects[k].getParam( i );
             file << std::fixed << std::setprecision( 10 )

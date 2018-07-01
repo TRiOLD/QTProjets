@@ -88,6 +88,9 @@ matrix<F32> * CatalogGAIA2::CRTmatrixOfThis( S32 Y, S32 X )
     {
         D64 val1 = getObj( i )->getParam( RA );
         D64 val2 = getObj( i )->getParam( DEC );
+
+        if( val2 < -1.6  )   cout << i << " ";
+
         if( val1 < minRa )  minRa = val1;
         if( val1 > maxRa )  maxRa = val1;
         if( val2 < minDec )  minDec = val2;

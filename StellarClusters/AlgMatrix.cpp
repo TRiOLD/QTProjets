@@ -108,12 +108,30 @@ matrix<F32> * AlgMatrix::CRTdeviations_allX( matrix<F32> * data )
 }
 
 
-matrix<F32> * AlgMatrix::CRTdeviations_Gauss( matrix<F32> * data, U16 coreSize )
+matrix<F32> * AlgMatrix::CRTsmooth( matrix<F32> * data, U16 coreSize )
 {
     const S32 X = data->getSizeX(), Y = data->getSizeY();
     matrix<F32> * resData = new matrix<F32>( Y, X );
 
-    // Подумать и написать хитрую штуку с корреляцией Гаусса по всему массиву!
+    const U16 cSizeL = coreSize * coreSize;
+    const S32 halfL = S32(coreSize / 2.0 + 0.5);
+
+    for( S32 j = 0; j < Y; j++ )
+        for( S32 i = 0; i < X; i++ )
+        {
+            vector<F32> core( cSizeL );
+
+            U16 k = 0;
+            for( S32 m = 0, q = -halfL; m < coreSize; m++, q++ )
+                for( S32 n = 0, p = -halfL; n < coreSize; n++, p++ )
+                    if( i+p >= 0 && i+p < X && j+q >= 0 && j+q < Y )
+                    {
+                        core[k] = (*data)[j+q][i+p];
+                        k++;
+                    }
+
+            (*resData)[j][i] = Algorithms::average( core, k );
+        }
 
     return resData;
 }
@@ -186,7 +204,7 @@ matrix<F32> * AlgMatrix::CRTfilter_justFilter( matrix<F32> * data, U16 coreSize 
         }
     D64 mainSerSum = average( mainCore, N );
 
-    const D64 dev = 0.6;
+    const D64 dev = 0.6;     //Чувствительность
 
     for( S32 j = 0; j < Y; j++ )
         for( S32 i = 0; i < X; i++ )
@@ -233,8 +251,8 @@ matrix<F32> * AlgMatrix::CRTconvolution_withGauss( matrix<F32> * data, U16 coreS
 
     const U16 cSizeX = coreSize;
     const U16 cSizeY = coreSize;
-    const D64 SigX = cSizeX / 5.0;
-    const D64 SigY = cSizeY / 5.0;
+    const D64 SigX = 1.0;//cSizeX / 5.0;
+    const D64 SigY = 1.0;//cSizeY / 5.0;
 
     matrix<D64> core( cSizeY, cSizeX );
     const S32 halfX = S32(cSizeX / 2.0 + 0.5);
@@ -267,6 +285,106 @@ matrix<F32> * AlgMatrix::CRTconvolution_withGauss( matrix<F32> * data, U16 coreS
                         (*resData)[j][i] += (*data)[j+q][i+p] * (F32)core[m][n];
         }
 
+    return resData;
+}
+
+
+matrix<F32> * AlgMatrix::CRTnormalization_pow2Max( matrix<F32> * data )
+{
+    const S32 X = data->getSizeX(), Y = data->getSizeY();
+    matrix<F32> * resData = new matrix<F32>( Y, X );
+    matrix<F32> * tempData = new matrix<F32>( Y, X );
+
+    F32 minMainVal = 2147483648, maxMainVal = 0;
+    for( S32 j = 0; j < Y; j++ )
+        for( S32 i = 0; i < X; i++ )
+        {
+            if( (*data)[j][i] > maxMainVal )    maxMainVal = (*data)[j][i];
+            if( (*data)[j][i] < minMainVal )    minMainVal = (*data)[j][i];
+        }
+    for( S32 j = 0; j < Y; j++ )
+        for( S32 i = 0; i < X; i++ )
+            (*tempData)[j][i] = (*data)[j][i] - minMainVal;
+    maxMainVal -= minMainVal;
+
+    F32 maxLoc = 0;
+    for( S32 j = 0; j < Y; j++ )
+        for( S32 i = 0; i < X; i++ )
+        {
+            (*tempData)[j][i] *= (*tempData)[j][i];
+            if( (*tempData)[j][i] > maxLoc )    maxLoc = (*tempData)[j][i];
+        }
+    for( S32 j = 0; j < Y; j++ )
+        for( S32 i = 0; i < X; i++ )
+            (*resData)[j][i] = (*tempData)[j][i] / maxLoc * maxMainVal;
+
+    delete tempData;
+    return resData;
+}
+
+
+matrix<F32> * AlgMatrix::CRTnormalization_justNorm( matrix<F32> * data )
+{
+    const S32 X = data->getSizeX(), Y = data->getSizeY();
+    matrix<F32> * resData = new matrix<F32>( Y, X );
+    matrix<F32> * tempData = new matrix<F32>( *data );
+    const S32 N = X * Y;
+
+    const D64 epsilon = 0.0001; // придел сходимость дисперсии
+
+    D64 averCore = 0.0, sigmaCore = 65536, sigmaTempCore = 0.0;
+    while( abs( sigmaCore - sigmaTempCore ) > epsilon )
+    {
+        vector<F32> core( N );
+        S32 k = 0;
+        for( S32 j = 0; j < Y; j++ )
+            for( S32 i = 0; i < X; i++ )
+                if( (*tempData)[j][i] >= 1.0f )
+                {
+                    core[k] = (*tempData)[j][i];
+                    k++;
+                }
+
+        averCore = Algorithms::average( core, k );
+        sigmaTempCore = sigmaCore;
+        sigmaCore = Algorithms::stdDeviation( core, averCore, k );
+
+        for( S32 j = 0; j < Y; j++ )
+            for( S32 i = 0; i < X; i++ )
+                if( (*tempData)[j][i] > averCore + 3 * sigmaCore )
+                    (*tempData)[j][i] = averCore;
+
+        cout << endl << averCore << " " << sigmaCore << endl;
+    }
+
+    for( S32 j = 0; j < Y; j++ )
+        for( S32 i = 0; i < X; i++ )
+        {
+            (*resData)[j][i] = (*data)[j][i] - (averCore + 5 * sigmaCore);
+            if( (*resData)[j][i] < 0.0f )   (*resData)[j][i] = 0.0f;
+        }
+
+    for( S32 j = 0; j < Y; j++ )
+        for( S32 i = 0; i < X; i++ )
+            if( (*resData)[j][i] >= 1.0 )
+            {
+                S32 iter = 0;
+                S32 x1 = i - 1, x2 = i + 1;
+                S32 y1 = j - 1, y2 = j + 1;
+                if( x1 >= 0 )
+                    if( (*resData)[j][x1] > 1 ) iter++;
+                if( x2 < X )
+                    if( (*resData)[j][x2] > 1 ) iter++;
+                if( y1 >= 0 )
+                    if( (*resData)[y1][i] > 1 ) iter++;
+                if( y2 < Y )
+                    if( (*resData)[y2][i] > 1 ) iter++;
+
+                if( !iter )
+                    (*resData)[j][i] = 0.0f;
+            }
+
+    delete tempData;
     return resData;
 }
 
