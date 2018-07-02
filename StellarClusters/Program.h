@@ -10,6 +10,7 @@
 #include "matrix.h"
 #include "MathMatrix.h"
 #include "Algorithms.h"
+#include "Clustering.h"
 #include "AlgMatrix.h"
 #include "PictureObject.h"
 

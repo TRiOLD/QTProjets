@@ -264,13 +264,13 @@ void Program::process1()    // Сшивка всех найденных скоп
             if( sqrt( pow( (ra - ra0), 2 ) + pow( (dec - dec0), 2 ) ) < 0.005 )
             {
                 if( !repeat )
-                    CatalogGC_FixDev.pushBack( *CatalogGC.getObj( i ) );
-                CatalogGC_FixDev.pushBack( *CatalogGC.getObj( j ) );
+                    CatalogGC_FixDev.pushBack( &*CatalogGC.getObj( i ) );
+                CatalogGC_FixDev.pushBack( &*CatalogGC.getObj( j ) );
                 repeat++;
             }
         }
         if( !repeat )
-            CatalogGC_Fix.pushBack( *CatalogGC.getObj( i ) );
+            CatalogGC_Fix.pushBack( &*CatalogGC.getObj( i ) );
     }
     cout << "Done." << endl;
 
@@ -290,5 +290,74 @@ void Program::process1()    // Сшивка всех найденных скоп
 
 void Program::process2()    // Отделение скоплений от звезд фона
 {
+    cout << "===== Start stitch processing =====" << endl << endl;
 
+    const string prefix = "rgaia2_";
+
+    CatalogMyGC CatalogGCs;
+    CatalogGAIA2 CatalogPartGaiaDR2;
+
+    string pathCatGCs = args[1] + prefix + "FIX" + "AllGlobularClasters.txt" ;
+
+    cout << "Opening and reading catalog GC... ";
+    if( !CatalogGCs.readFile( pathCatGCs ) )
+    {
+        cout << "Error!!! File not found." << endl;
+        cout << "(" << pathCatGCs.c_str() << endl << endl;
+        return;
+    }
+    cout << "Done." << endl;
+    cout << " - All Globular Clasters: " << CatalogGCs.getObjCount() << endl;
+    cout << " - File: " << pathCatGCs.c_str() << endl;
+    cout << "==========" << endl << endl;
+
+    S32 pxlNumber = -1;
+
+    S32 n = 0;
+    while( n < CatalogGCs.getObjCount() )
+    {
+        cout << "Opening and reading catalog (Part)... ";
+
+        D64 t1 = (D64)clock() / CLOCKS_PER_SEC;
+
+        bool chPxl = pxlNumber != CatalogGCs.getObj( n )->getParam( 0 );
+        pxlNumber = CatalogGCs.getObj( n )->getParam( 0 );
+        S32 gcNumber = CatalogGCs.getObj( n )->getParam( 1 );
+
+        string pathFileRead = args[1] + prefix + to_string( pxlNumber ) + ".txt";
+        string pathFileWrite = args[2] + prefix + to_string( pxlNumber ) + "_" + to_string( gcNumber ) + ".txt";
+
+        if( chPxl )
+            if( !CatalogPartGaiaDR2.readFile( pathFileRead ) )
+            {
+                cout << "Error!!! File not found." << endl;
+                cout << "(" << pathFileRead.c_str() << ")" << endl << endl;
+                while( CatalogGCs.getObj( n )->getParam( 0 ) == pxlNumber ) n++;
+                continue;
+            }
+
+        cout << "Done." << endl;
+        cout << " - File: " << pathFileRead.c_str() << endl;
+        cout << " - Objects = " << CatalogPartGaiaDR2.getObjCount() << endl;
+        D64 t2 = (D64)clock() / CLOCKS_PER_SEC;
+        cout << " - Runtime = " << t2 - t1 << " ( " << t2 << " )"  << endl;
+
+
+        cout << "Processing & writing Globular Cluster data... ";
+        Catalog * CatalogGC = Clustering::CRTcatalog_TrueGC( &CatalogPartGaiaDR2, CatalogGCs.getObj( n ) );
+        CatalogGC->writeToFile( pathFileWrite );
+        D64 t3 = (D64)clock() / CLOCKS_PER_SEC;
+        cout << "Done." << endl;
+        cout << " - File: " << pathFileWrite.c_str() << endl;
+        cout << " - Objects = " << CatalogGC->getObjCount() << endl;
+        cout << " - Runtime = " << t3 - t2 << " ( " << t3 << " )"  << endl;
+
+        delete CatalogGC;
+        cout << "==========" << endl << endl;
+
+        n++;
+    }
+
+    cout << endl << "All runtime = " << (D64)clock() / CLOCKS_PER_SEC << "." << endl;
+    cout << "==== Process completed =====" << endl;
 }

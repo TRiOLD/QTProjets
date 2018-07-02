@@ -11,7 +11,7 @@
 class Clustering : public Algorithms
 {
 public:
-    static Catalog * CRTcatalog_TrueGC( CatalogGAIA2 * catPart, CelestialBody * gc );
+    static Catalog * CRTcatalog_TrueGC( Catalog * catPart, CelestialBody * gc );
 };
 
 #endif // CLUSTERING_H

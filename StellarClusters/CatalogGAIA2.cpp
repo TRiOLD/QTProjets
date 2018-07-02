@@ -13,7 +13,7 @@ bool CatalogGAIA2::readFile( string fileName )
     U32 rows = 0;
     string fileString;
     getline( file, fileString );
-    U32 colms = Algorithms::calculateWordsInSrting( fileString );
+    U32 colms = 12; //Algorithms::calculateWordsInSrting( fileString );
     while( getline( file, fileString ) )
         rows++;
 
@@ -35,7 +35,6 @@ bool CatalogGAIA2::readFile( string fileName )
         m_objects[k].setParam( stod( W[9] ), eMuRA );
         m_objects[k].setParam( stod( W[10] ), muDEC );
         m_objects[k].setParam( stod( W[11] ), eMuDEC );
-        m_objects[k].setParam( stod( W[12] ), MAG );
 
         k++;
     }
