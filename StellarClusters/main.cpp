@@ -5,7 +5,7 @@ int main( int argc, char* argv[] )
 {
     Program prgm( argc, argv );
     prgm.initialize();
-    prgm.process1();
+    prgm.process2();
     prgm.shutdown();
 
     return 0;

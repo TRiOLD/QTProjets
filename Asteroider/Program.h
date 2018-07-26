@@ -9,6 +9,7 @@ class Program
 {
 public:
     Program();
+    Program( S32 argc, C8* argv[] );
     ~Program();
 
 private:
@@ -18,6 +19,5 @@ public:
     void initialize();
     void shutdown();
 };
-
 
 #endif // PROGRAM_H

@@ -51,12 +51,12 @@ public:
         }
     }
 
-    void pushBack( CelestialBody body )
+    void pushBack( CelestialBody * body )
     {
-        m_objects.push_back( body );
+        m_objects.push_back( *body );
     }
 
-    void pushBack( CatalogMyGC * cat )
+    void pushBack( Catalog * cat )
     {
         S32 N = cat->getObjCount() - 1; //Костыль!!!
         S32 I0 = getObjCount();

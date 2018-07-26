@@ -119,7 +119,7 @@ matrix<F32> * AlgMatrix::CRTsmooth( matrix<F32> * data, U16 coreSize )
     for( S32 j = 0; j < Y; j++ )
         for( S32 i = 0; i < X; i++ )
         {
-            vector<F32> core( cSizeL );
+            vector<D64> core( cSizeL );
 
             U16 k = 0;
             for( S32 m = 0, q = -halfL; m < coreSize; m++, q++ )
@@ -147,7 +147,7 @@ matrix<F32> * AlgMatrix::CRTsmooth_X( matrix<F32> * data, U16 coreSize )
     for( int j = 0; j < Y; j++ )
         for( int i = 0; i < X; i++ )
         {
-            vector<float> core( 5 * coreSize );
+            vector<D64> core( 5 * coreSize );
             int k = 0;
 
             for( int m = 0, q = -halfL; m < coreSize; m++, q++ )
@@ -195,7 +195,7 @@ matrix<F32> * AlgMatrix::CRTfilter_justFilter( matrix<F32> * data, U16 coreSize 
     const S32 halfL = S32(coreSize / 2.0 + 0.5);
 
     const S32 N = X * Y; S32 n = 0;
-    vector<F32> mainCore( N );
+    vector<D64> mainCore( N );
     for( S32 j = 0; j < Y; j++ )
         for( S32 i = 0; i < X; i++ )
         {
@@ -209,7 +209,7 @@ matrix<F32> * AlgMatrix::CRTfilter_justFilter( matrix<F32> * data, U16 coreSize 
     for( S32 j = 0; j < Y; j++ )
         for( S32 i = 0; i < X; i++ )
         {
-            vector<F32> core( cSizeL );
+            vector<D64> core( cSizeL );
 
             U16 k = 0;
             for( S32 m = 0, q = -halfL; m < coreSize; m++, q++ )
@@ -335,7 +335,7 @@ matrix<F32> * AlgMatrix::CRTnormalization_justNorm( matrix<F32> * data )
     D64 averCore = 0.0, sigmaCore = 65536, sigmaTempCore = 0.0;
     while( abs( sigmaCore - sigmaTempCore ) > epsilon )
     {
-        vector<F32> core( N );
+        vector<D64> core( N );
         S32 k = 0;
         for( S32 j = 0; j < Y; j++ )
             for( S32 i = 0; i < X; i++ )

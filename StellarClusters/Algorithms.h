@@ -89,7 +89,7 @@ public:
         return res;
     }
 
-    static double average( std::vector<float> &arr, unsigned int n )
+    static double average( std::vector<double> &arr, unsigned int n )
     {
         double res = 0;
         for( unsigned int i = 0; i < n; i++ )
@@ -107,7 +107,7 @@ public:
         return res;
     }
 
-    static double stdDeviation( std::vector<float> &arr, double arrMean, unsigned int n )
+    static double stdDeviation( std::vector<double> &arr, double arrMean, unsigned int n )
     {
         double res = 0;
         for( unsigned int i = 0; i < n; i++ )
