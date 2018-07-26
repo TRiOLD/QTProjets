@@ -1,5 +1,6 @@
 #include "Clustering.h"
 
+<<<<<<< HEAD
 
 Catalog * Clustering::CRTcatalog_TrueGC( Catalog * catPart, CelestialBody * gc )
 {
@@ -9,12 +10,23 @@ Catalog * Clustering::CRTcatalog_TrueGC( Catalog * catPart, CelestialBody * gc )
     D64 GCRa = gc->getParam( 7 );
     D64 GCDec = gc->getParam( 8 );
     D64 GCRad = (gc->getParam( 9 ) + gc->getParam( 10 )) / 4 / 10;
+=======
+Catalog * Clustering::CRTcatalog_TrueGC( Catalog * catPart, CelestialBody * gc )
+{
+//  Catalog * resCat = new Catalog();
+    Catalog * allCat = new Catalog();
+
+    D64 GCRa = gc->getParam( 7 );
+    D64 GCDec = gc->getParam( 8 );
+    D64 GCRad = (gc->getParam( 9 ) + gc->getParam( 10 )) / 4;
+>>>>>>> 6a1d856e197d7a81cae154a47d76ec81d9f15261
 
     for( S32 i = 0; i < catPart->getObjCount(); i++ )
     {
         D64 ra = catPart->getObj( i )->getParam( RA );
         D64 dec = catPart->getObj( i )->getParam( DEC );
         D64 rad = sqrt( pow( ra - GCRa, 2 ) + pow( dec - GCDec, 2 ) );
+<<<<<<< HEAD
 
         if( rad <= GCRad )
             potCat->pushBack( catPart->getObj( i ) );
@@ -39,6 +51,10 @@ Catalog * Clustering::CRTcatalog_TrueGC( Catalog * catPart, CelestialBody * gc )
             plxs[itPx] = plx;
             itPx++;
         }
+=======
+        if( rad <= 10 * GCRad )
+            allCat->pushBack( catPart->getObj( i ) );
+>>>>>>> 6a1d856e197d7a81cae154a47d76ec81d9f15261
     }
     D64 averMuRa = Algorithms::average( muRas, itPr );
     D64 averMuDec = Algorithms::average( muDecs, itPr );
@@ -47,6 +63,7 @@ Catalog * Clustering::CRTcatalog_TrueGC( Catalog * catPart, CelestialBody * gc )
     D64 sigmaMuDec = Algorithms::stdDeviation( muDecs, averMuDec, itPr );
     D64 sigmaPlx = Algorithms::stdDeviation( plxs, averPlx, itPx );
 
+<<<<<<< HEAD
     const D64 epsilon = 0.00000001;
     D64 sigmaPrprMtn = 0.0, sigmaPrprMtn_temp = 0.0;
     do
@@ -109,4 +126,8 @@ Catalog * Clustering::CRTcatalog_TrueGC( Catalog * catPart, CelestialBody * gc )
 
     delete potCat;
     return resCat;
+=======
+//    delete allCat;
+    return allCat;
+>>>>>>> 6a1d856e197d7a81cae154a47d76ec81d9f15261
 }
