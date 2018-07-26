@@ -297,12 +297,7 @@ void Program::process2()    // Отделение скоплений от зве
     CatalogMyGC CatalogGCs;
     CatalogGAIA2 CatalogPartGaiaDR2;
 
-<<<<<<< HEAD
-  //string pathCatGCs = args[1] + prefix + "FIX" + "AllGlobularClasters.txt";
-    string pathCatGCs = args[1] + "rgaia2_27_GlobularClasters.txt";
-=======
     string pathCatGCs = args[1] + prefix + "FIX" + "AllGlobularClasters.txt" ;
->>>>>>> 6a1d856e197d7a81cae154a47d76ec81d9f15261
 
     cout << "Opening and reading catalog GC... ";
     if( !CatalogGCs.readFile( pathCatGCs ) )
